@@ -1,0 +1,14 @@
+# MongoDB Data
+mongo_data/
+data/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
