@@ -2,7 +2,7 @@ from pydantic import BaseModel, Field
 from app.models.project.project_template import ProjectTemplate
 from app.models.enums import NodeType, DifficultyLevel, SessionStatus
 from app.models.project.project_template import TaskTemplate, SubTaskTemplate
-from app.models.project.project_session import ProjectSession
+from app.models.project.project_session import ProjectSession, SubtaskStatus
 
 #################### Project Expand DTOs ###################
 
@@ -66,7 +66,7 @@ class ProjectSessionSubmitRequest(BaseModel):
 
 class ProjectSessionSubmitResponse(BaseModel):
     """Response model after submitting a subtask attempt"""
-    status : SessionStatus 
+    status : SubtaskStatus
     score: int
     feedback: str
     is_task_completed: bool | None
@@ -74,17 +74,17 @@ class ProjectSessionSubmitResponse(BaseModel):
 
 
 class ProjectSessionSubmitFailedResponse(ProjectSessionSubmitResponse):
-    status : SessionStatus.FAILED
+    status =  SubtaskStatus.FAILED
     score: int = 0
     is_task_completed: bool | None = False
     is_project_completed: bool | None = False
 
 class ProjectSessionSubmitPassedResponse(ProjectSessionSubmitResponse):
-    status : SessionStatus.PASSED
+    status = SubtaskStatus.PASSED
     next_subtask: SubTaskTemplate
 
 class ProjectSessionSubmitProjectCompletedResponse(ProjectSessionSubmitResponse):
-    status : SessionStatus.PASSED
+    status  = SubtaskStatus.PASSED
     is_task_completed: bool | None = True
     is_project_completed: bool | None = True
     total_score: float
@@ -94,7 +94,7 @@ class ProjectSessionSubmitProjectCompletedResponse(ProjectSessionSubmitResponse)
     message: str
 
 class ProjectSessionForfeitResponse(ProjectSessionSubmitResponse):
-    status : SessionStatus.FORFEITED
+    status =  SubtaskStatus.FORFEITED
     score: int = 0
     message: str = "The subtask has been forfeited."
     solution: str
