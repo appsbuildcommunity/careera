@@ -20,3 +20,13 @@ class NodeStatus(str, Enum):
     LOCKED = "LOCKED"
     UNLOCKED = "UNLOCKED"
     COMPLETED = "COMPLETED"
+
+class ExperienceLevel(str, Enum):
+    ENTRY = "ENTRY"
+    MID = "MID"
+    SENIOR = "SENIOR"
+
+class SubmissionType(str, Enum):
+    CODE = "CODE"
+    TEXT_ANSWER = "TEXT_ANSWER"
+    GITHUB_LINK = "GITHUB_LINK"
