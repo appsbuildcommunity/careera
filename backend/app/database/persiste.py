@@ -5,8 +5,8 @@ from app.models import ProfileAnalysisResponse
 async def store_analysis_result(user_id: str, analysis: ProfileAnalysisResponse) -> None:
     """Store the analysis result in MongoDB."""
     try:
-        db = get_database()
-        coll = db.profiles_analyse_resulte
+        db = await get_database()
+        coll = db["profiles_analyse_resulte"]
         await coll.insert_one({
                "user_id": user_id,
                "profile_summary": analysis.profile.profile_summary,
