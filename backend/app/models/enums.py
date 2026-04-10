@@ -1,9 +1,10 @@
 from enum import Enum
 
-class DifficultyLevel ( str ,  Enum ):
+class DifficultyLevel (str, Enum ):
     EASY = "EASY"
     MEDIUM = "MEDIUM"
     HARD = "HARD"
+    EXPERT = "EXPERT"
 
 class SessionStatus(str, Enum):
     IN_PROGRESS = "IN_PROGRESS"
@@ -27,6 +28,11 @@ class ExperienceLevel(str, Enum):
     SENIOR = "SENIOR"
 
 class SubmissionType(str, Enum):
-    CODE = "CODE"
-    TEXT_ANSWER = "TEXT_ANSWER"
+    CODE_SNIPPET = "CODE_SNIPPET"
     GITHUB_LINK = "GITHUB_LINK"
+    TEXT_ANSWER = "TEXT_ANSWER"
+
+class Sentiment(str, Enum):
+    POSITIVE = "POSITIVE"
+    NEUTRAL = "NEUTRAL"
+    NEGATIVE = "NEGATIVE"
