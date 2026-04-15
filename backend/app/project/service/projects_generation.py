@@ -6,6 +6,11 @@ from string import Template
 from pydantic import ValidationError
 
 from app.project.db.persiste import store_projects_generation_result
+from app.project.service.errors import (
+    ProjectGenerationLLMError,
+    ProjectGenerationParseError,
+    ProjectPersistenceError,
+)
 from app.project.model.project_generation import (
     ProjectsGenerationRequest,
     ProjectsGenerationResponse,
@@ -13,6 +18,7 @@ from app.project.model.project_generation import (
 )
 from app.share.model.llmchat import LLMChat
 from app.share.utils import call_llm, extract_json_payload
+
 
 SYSTEM_PROMPT = Template("""You are a senior software architect and career coach.
 
@@ -70,6 +76,10 @@ async def projects_generation(user_id: str, project_request: ProjectsGenerationR
     """Generate a list of project candidates from career path and preferences."""
     try:
         raw_response = await call_llm(_build_chat(project_request))
+    except Exception as e:
+        raise ProjectGenerationLLMError("Failed to call LLM for project generation") from e
+
+    try:
         payload = extract_json_payload(raw_response)
         projects_data = payload.get("projects", [])
 
@@ -93,10 +103,13 @@ async def projects_generation(user_id: str, project_request: ProjectsGenerationR
 
         if not projects:
             raise ValueError("No valid projects generated")
-
-        await store_projects_generation_result(user_id, projects)
-
-        return ProjectsGenerationResponse(projects=projects)
     except Exception as e:
-        raise ValueError(f"Failed to generate projects list payload: {e}") from e
+        raise ProjectGenerationParseError(f"Failed to parse projects payload: {e}") from e
+
+    try:
+        await store_projects_generation_result(user_id, projects)
+    except Exception as e:
+        raise ProjectPersistenceError("Failed to persist generated projects") from e
+
+    return ProjectsGenerationResponse(projects=projects)
 
