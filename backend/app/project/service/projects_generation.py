@@ -5,46 +5,60 @@ from string import Template
 
 from pydantic import ValidationError
 
-from app.project.db.persiste import store_projects_generation_result
+from app.project.db.persiste import (
+    store_projects_generation_result,
+)
 from app.project.service.errors import (
     ProjectGenerationLLMError,
     ProjectGenerationParseError,
     ProjectPersistenceError,
 )
-from app.project.model.project_generation import (
+from app.project.model import (
     ProjectsGenerationRequest,
     ProjectsGenerationResponse,
     ProjectSeed
 )
-from app.share.model.llmchat import LLMChat
+from app.share.model import LLMChat
 from app.share.utils import call_llm, extract_json_payload
 
 
 SYSTEM_PROMPT = Template("""You are a senior software architect and career coach.
 
-Generate a list of project ideas as STRICTLY VALID JSON (parsable by json.loads), with this exact structure:
+Generate a list of project ideas as STRICTLY VALID JSON (parsable by json.loads).
+
+Output EXACTLY this structure:
 
 {
-    "projects": [
+  "projects": [
+    {
+      "title": "string",
+      "description": "string",
+      "specifications": "markdown string with sections: Overview, Architecture, Features, Constraints",
+      "suggested_tech_stack": ["string"],
+      "phases": [
         {
-            "title": "string",
-            "description": "string",
-            "specifications": "markdown string with sections: Overview, Architecture, Features, Constraints",
-            "suggested_tech_stack": ["string"]
+          "title": "string",
+          "description": "string"
+          "phase_number": "int"
         }
-    ]
+      ]
+    }
+  ]
 }
 
-Constraints:
-- MUST return 3-5 projects
-- Projects MUST align to target role, experience level, skills, and preferences
-- Each project should be realistically buildable and portfolio-worthy
-- Output MUST be raw JSON only (no markdown, no explanations, no trailing commas)
+Rules:
+- MUST return 3 to 5 projects
+- "phases" MUST contain between 3 and 10 items
+- Each phase must represent a major step in the project
+- No trailing commas
+- No comments
+- No explanations outside JSON
+- Output MUST be raw JSON only
 
-USER CAREER CONTEXT(JSON):
-        $request
-
+USER CAREER CONTEXT (JSON):
+$request
 """)
+
 
 
 def _build_generation_payload(project_request: ProjectsGenerationRequest) -> dict[str, Any]:
@@ -72,6 +86,33 @@ def _build_chat(project_request: ProjectsGenerationRequest) -> LLMChat:
     )
 
 
+def _normalize_project_data(project_data: dict[str, Any]) -> dict[str, Any]:
+    """Normalize LLM payload to expected project seed schema."""
+    normalized = dict(project_data)
+    raw_phases = normalized.get("phases", [])
+
+    if not isinstance(raw_phases, list):
+        normalized["phases"] = []
+        return normalized
+
+    phases = []
+    for index, phase in enumerate(raw_phases):
+        if not isinstance(phase, dict):
+            continue
+
+        item = dict(phase)
+        item.setdefault("phase_number", index + 1)
+
+        # project/generate expects phase outline only; tasks can be expanded later
+        if not isinstance(item.get("tasks"), list):
+            item["tasks"] = []
+
+        phases.append(item)
+
+    normalized["phases"] = phases
+    return normalized
+
+
 async def projects_generation(user_id: str, project_request: ProjectsGenerationRequest) -> ProjectsGenerationResponse:
     """Generate a list of project candidates from career path and preferences."""
     try:
@@ -95,11 +136,13 @@ async def projects_generation(user_id: str, project_request: ProjectsGenerationR
                 projects.append(
                     ProjectSeed(
                         project_id=str(uuid.uuid4()),
-                        **project_data
+                        **_normalize_project_data(project_data)
                     )
                 )
             except ValidationError as exc:
                 raise ValueError(f"Project at index {index} failed validation: {exc}") from exc
+
+        
 
         if not projects:
             raise ValueError("No valid projects generated")
