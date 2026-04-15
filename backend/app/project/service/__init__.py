@@ -1,1 +1,2 @@
 from .projects_generation import projects_generation as projects_generation_service
+from .project_expansion import expend_project as expend_project_service

@@ -8,3 +8,10 @@ class ProjectGenerationParseError(Exception):
 
 class ProjectPersistenceError(Exception):
     """Raised when generated projects cannot be persisted."""
+
+
+class ProjectSelectionNotFoundError(Exception):
+    """Raised when selected project id does not exist for user."""
+
+class ProjectExpansionPersistenceError(Exception):
+    """Raised when expanded project cannot be persisted."""

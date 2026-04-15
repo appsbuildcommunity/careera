@@ -1,4 +1,8 @@
 from .project_generation import (
+    ExpandedProjectResponse,
     ProjectsGenerationRequest,
-    ProjectsGenerationResponse
+    ProjectsGenerationResponse,
+    ProjectExpendRequest,
+    ProjectSeed,
+    Phase,
     )

@@ -20,6 +20,16 @@ class ProjectsGenerationResponse(BaseModel):
     projects: List[ProjectSeed]
 
 
+class ProjectExpendRequest(BaseModel):
+    """Request containing chosen project from generated list."""
+    project_id: str
+    phase_number: int = Field(ge=1)
+
+class ExpandedProjectResponse(BaseModel):
+    """Response containing expanded project details."""
+    project: ProjectSeed
+
+
 class Task(BaseModel):
     task_id: Optional[str] = None
     task_number: int
@@ -31,7 +41,8 @@ class Task(BaseModel):
 class Phase(BaseModel):
     title: str
     description: str
-    tasks: List[Task]
+    phase_number: int
+    tasks: List[Task] = Field(default_factory=list)
 
 class ProjectSeed(BaseModel):
     """Project candidate generated for user selection."""
@@ -40,9 +51,7 @@ class ProjectSeed(BaseModel):
     description: str
     specifications: str
     suggested_tech_stack: List[str] = Field(default_factory=list)
-
-
-
+    phases: List[Phase] = Field(default_factory=list)
 
 # Database Models
 class ProjectInDB(BaseModel):
