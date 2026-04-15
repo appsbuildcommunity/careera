@@ -3,6 +3,8 @@ import uuid
 from typing import Any
 from string import Template
 
+from pydantic import ValidationError
+
 from app.project.db.persiste import store_projects_generation_result
 from app.project.model.project_generation import (
     ProjectsGenerationRequest,
@@ -66,30 +68,35 @@ def _build_chat(project_request: ProjectsGenerationRequest) -> LLMChat:
 
 
 
-async def projects_generation(project_request: ProjectsGenerationRequest) -> ProjectsGenerationResponse:
+async def projects_generation(user_id: str, project_request: ProjectsGenerationRequest) -> ProjectsGenerationResponse:
     """Generate a list of project candidates from career path and preferences."""
-    raw_response = await call_llm(_build_chat(project_request))
-
     try:
+        raw_response = await call_llm(_build_chat(project_request))
         payload = extract_json_payload(raw_response)
         projects_data = payload.get("projects", [])
 
         if not isinstance(projects_data, list):
             raise ValueError("Expected 'projects' to be a list")
 
-        projects = [
-            ProjectSeed(
-                project_id=str(uuid.uuid4()),
-                **project_data
-            )
-            for project_data in projects_data
-            if isinstance(project_data, dict)
-        ]
+        projects = []
+        for index, project_data in enumerate(projects_data):
+            if not isinstance(project_data, dict):
+                raise ValueError(f"Project at index {index} is not an object")
+
+            try:
+                projects.append(
+                    ProjectSeed(
+                        project_id=str(uuid.uuid4()),
+                        **project_data
+                    )
+                )
+            except ValidationError as exc:
+                raise ValueError(f"Project at index {index} failed validation: {exc}") from exc
 
         if not projects:
             raise ValueError("No valid projects generated")
 
-        await store_projects_generation_result("999", projects)
+        await store_projects_generation_result(user_id, projects)
 
         return ProjectsGenerationResponse(projects=projects)
     except Exception as e:

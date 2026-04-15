@@ -60,3 +60,4 @@ Thumbs.db
 *.bak
 *.cache
 .temp/
+.github/

@@ -1,12 +1,11 @@
 from pydantic import BaseModel, Field
 from typing import Optional, List
 
-from app.project.model.enums import ExperienceLevel, SubmissionType
+from app.share.model.enums import ExperienceLevel, SubmissionType
 
 # Request Models
 class ProjectsGenerationRequest(BaseModel):
     """Request to generate a list of project ideas from career path and preferences."""
-    user_id: Optional[str] = None
     target_role: str
     experience_level: ExperienceLevel
     preferred_tech_stack: List[str] = Field(default_factory=list)
