@@ -2,7 +2,6 @@ import json
 import re
 from typing import Any
 
-from fastapi import Depends
 from app.models import (
     CareerPathRecommendation,
     ProfileAnalysisRequest,
@@ -60,7 +59,7 @@ def _build_messages(profile: ProfileAnalysisRequest) -> list[dict[str, Any]]:
     ]
 
 
-def _extract_json_payload(raw_response: str) -> dict[str, Any]:
+def _extract_json_payload(raw_response: str) -> dict[str, any]:
     cleaned = raw_response.strip()
     fenced_match = re.search(r"```(?:json)?\s*(.*?)\s*```", cleaned, re.DOTALL | re.IGNORECASE)
     if fenced_match:

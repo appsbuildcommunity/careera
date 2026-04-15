@@ -42,10 +42,8 @@ class CareerPathInDB(BaseModel):
     """Career path analysis document in MongoDB"""
     id: str
     user_id: str
-    profile_summary: str
-    hard_skills: List[str] = []
-    soft_skills: List[str] = []
+    user_profile: UserProfile
     recommendations: List[CareerPathRecommendation] = []
+    preferences: UserPreferences = UserPreferences()
     created_at: datetime
     updated_at: datetime
-    preferences: UserPreferences = UserPreferences()

@@ -23,8 +23,9 @@ class NodeStatus(str, Enum):
     COMPLETED = "COMPLETED"
 
 class ExperienceLevel(str, Enum):
-    ENTRY = "ENTRY"
-    MID = "MID"
+    ENTRY_LEVEL = "ENTRY_LEVEL"
+    JUNIOR = "JUNIOR"
+    MID_LEVEL = "MID_LEVEL"
     SENIOR = "SENIOR"
 
 class SubmissionType(str, Enum):

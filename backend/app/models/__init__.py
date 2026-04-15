@@ -6,3 +6,12 @@ from .analyse_profile import (
     CareerPathInDB
     )
 
+from .project_generation import (
+    ProjectGenerationRequest,
+    ProjectGenerationResponse,
+    TaskEvaluationRequest,
+    TaskEvaluationResponse,
+    Task,
+    Phase,
+    ProjectInDB
+    )
