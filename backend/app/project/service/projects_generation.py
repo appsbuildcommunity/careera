@@ -13,6 +13,9 @@ from app.project.service.errors import (
     ProjectGenerationParseError,
     ProjectPersistenceError,
 )
+from app.share.utils.logger import get_logger
+
+logger = get_logger(__name__)
 from app.project.model import (
     ProjectsGenerationRequest,
     ProjectsGenerationResponse,
@@ -115,9 +118,11 @@ def _normalize_project_data(project_data: dict[str, Any]) -> dict[str, Any]:
 
 async def projects_generation(user_id: str, project_request: ProjectsGenerationRequest) -> ProjectsGenerationResponse:
     """Generate a list of project candidates from career path and preferences."""
+    logger.info(f"Starting project generation for user {user_id}")
     try:
         raw_response = await call_llm(_build_chat(project_request))
     except Exception as e:
+        logger.error(f"LLM call failed for user {user_id}: {str(e)}")
         raise ProjectGenerationLLMError("Failed to call LLM for project generation") from e
 
     try:
@@ -147,11 +152,14 @@ async def projects_generation(user_id: str, project_request: ProjectsGenerationR
         if not projects:
             raise ValueError("No valid projects generated")
     except Exception as e:
+        logger.error(f"Parse failed for user {user_id}: {str(e)}")
         raise ProjectGenerationParseError(f"Failed to parse projects payload: {e}") from e
 
     try:
         await store_projects_generation_result(user_id, projects)
+        logger.info(f"Generated {len(projects)} projects for user {user_id}")
     except Exception as e:
+        logger.error(f"Persistence failed for user {user_id}: {str(e)}")
         raise ProjectPersistenceError("Failed to persist generated projects") from e
 
     return ProjectsGenerationResponse(projects=projects)

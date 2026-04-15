@@ -1,12 +1,12 @@
-import logging
 from datetime import datetime, timezone
 
 from pydantic import ValidationError
 
 from app.database.connection import get_database
 from app.project.model.project_generation import ProjectSeed
+from app.share.utils.logger import get_logger
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 async def store_projects_generation_result(user_id: str, projects: list[ProjectSeed]) -> None:
     """Store the generated projects in MongoDB."""
@@ -18,8 +18,9 @@ async def store_projects_generation_result(user_id: str, projects: list[ProjectS
             "projects": [project.model_dump() for project in projects],
             "created_at": datetime.now(timezone.utc),
         })
-    except Exception:
-        logger.exception("Error storing project generation result")
+        logger.info(f"Stored {len(projects)} generated projects for user {user_id}")
+    except Exception as e:
+        logger.error(f"Failed to store project generation result for user {user_id}: {str(e)}")
         raise
 
 
@@ -35,10 +36,12 @@ async def get_generated_project_by_id(user_id: str, project_id: str) -> ProjectS
     )
 
     if not doc:
+        logger.warning(f"Project {project_id} not found for user {user_id}")
         return None
 
     projects = doc.get("projects", [])
     if not isinstance(projects, list) or not projects:
+        logger.warning(f"Project {project_id} data malformed for user {user_id}")
         return None
 
     project = projects[0]
@@ -46,8 +49,11 @@ async def get_generated_project_by_id(user_id: str, project_id: str) -> ProjectS
         return None
 
     try:
-        return ProjectSeed(**project)
-    except ValidationError:
+        result = ProjectSeed(**project)
+        logger.info(f"Retrieved project {project_id} for user {user_id}")
+        return result
+    except ValidationError as e:
+        logger.error(f"Project validation failed for {project_id}: {str(e)}")
         return None
 
 
@@ -62,8 +68,9 @@ async def store_expanded_project(user_id: str, project: ProjectSeed) -> None:
             "created_at": datetime.now(timezone.utc),
             "updated_at": datetime.now(timezone.utc),
         })
-    except Exception:
-        logger.exception("Error storing expanded project")
+        logger.info(f"Stored expanded project {project.project_id} for user {user_id}")
+    except Exception as e:
+        logger.error(f"Failed to store expanded project {project.project_id} for user {user_id}: {str(e)}")
         raise
 
 async def update_expanded_project(user_id: str, project: ProjectSeed) -> None:
@@ -79,6 +86,7 @@ async def update_expanded_project(user_id: str, project: ProjectSeed) -> None:
             }},
             upsert=True
         )
-    except Exception:
-        logger.exception("Error updating expanded project")
+        logger.info(f"Updated expanded project {project.project_id} for user {user_id}")
+    except Exception as e:
+        logger.error(f"Failed to update expanded project {project.project_id} for user {user_id}: {str(e)}")
         raise
