@@ -66,8 +66,6 @@ def _build_chat(project_request: ProjectsGenerationRequest) -> LLMChat:
     )
 
 
-
-
 async def projects_generation(user_id: str, project_request: ProjectsGenerationRequest) -> ProjectsGenerationResponse:
     """Generate a list of project candidates from career path and preferences."""
     try:

@@ -61,3 +61,5 @@ Thumbs.db
 *.cache
 .temp/
 .github/
+
+plane.md
