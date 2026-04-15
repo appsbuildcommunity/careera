@@ -2,13 +2,13 @@ import json
 import re
 from typing import Any
 
-from app.models import (
+from app.profile.model.analyse_profile import (
     CareerPathRecommendation,
     ProfileAnalysisRequest,
     ProfileAnalysisResponse,
     UserProfile,
 )
-from app.utils import call_llm
+from app.share.utils.call_llm import call_llm
 from app.database.persiste import store_analysis_result
 
 SYSTEM_PROMPT = """You are a senior career coach and technical profile analyst.

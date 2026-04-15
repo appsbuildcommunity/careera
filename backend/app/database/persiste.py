@@ -1,6 +1,6 @@
 from .connection import get_database
 from datetime import datetime
-from app.models import ProfileAnalysisResponse
+from app.profile.model.analyse_profile import ProfileAnalysisResponse
 
 async def store_analysis_result(user_id: str, analysis: ProfileAnalysisResponse) -> None:
     """Store the analysis result in MongoDB."""

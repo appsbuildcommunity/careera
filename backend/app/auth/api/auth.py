@@ -3,7 +3,7 @@ from fastapi.security import HTTPAuthorizationCredentials
 from datetime import datetime
 from bson import ObjectId
 
-from app.models.user import (
+from app.auth.model.user import (
     GoogleLoginRequest, 
     RefreshTokenRequest,
     LoginResponse, 
@@ -13,7 +13,7 @@ from app.models.user import (
     UserInDB,
     UserGamification
 )
-from app.utils.auth import (
+from app.auth.utils.auth import (
     verify_google_token,
     create_access_token,
     create_refresh_token,

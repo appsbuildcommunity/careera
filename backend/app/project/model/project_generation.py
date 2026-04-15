@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Field
 from typing import Any, Optional, List
 
-from app.models.enums import ExperienceLevel, SubmissionType
+from app.project.model.enums import ExperienceLevel, SubmissionType
 
 # Request Models
 class ProjectsGenerationRequest(BaseModel):

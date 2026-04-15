@@ -1,1 +1,0 @@
-from .analyse_profile import analyse_profile as analyse_profile_service

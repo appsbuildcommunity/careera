@@ -4,7 +4,7 @@ from typing import Any
 from uuid import uuid4
 from string import Template
 
-from app.models import (
+from app.project.model.project_generation import (
     ProjectsGenerationRequest,
     ProjectsGenerationResponse,
     ProjectExpandRequest,
@@ -15,8 +15,8 @@ from app.models import (
     Phase,
     Task,
 )
-from app.models.enums import SubmissionType
-from app.utils import call_llm
+from app.project.model.enums import SubmissionType
+from app.share.utils.call_llm import call_llm
 
 PROJECTS_GENERATION_PROMPT = Template("""You are a senior software architect and career coach.
 

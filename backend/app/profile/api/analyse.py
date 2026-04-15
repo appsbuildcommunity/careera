@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, status, Depends
-from app.models import ProfileAnalysisRequest, ProfileAnalysisResponse
-from app.services import analyse_profile_service
-from app.utils.auth import get_current_user
+from app.profile.model.analyse_profile import ProfileAnalysisRequest, ProfileAnalysisResponse
+from app.profile.service.analyse_profile import analyse_profile as analyse_profile_service
+from app.auth.utils.auth import get_current_user
 
 
 router = APIRouter(prefix="/analyse", tags=["Profile Analysis"])

@@ -39,14 +39,14 @@ async def health_check():
     }
 
 # Import and include routers with /api/v1 prefix (for later)
-# from app.api import auth, users, careers
+# from app.auth.api import auth
 # app.include_router(auth.router, prefix="/api/v1")
 # app.include_router(users.router, prefix="/api/v1")
 # ... etc
 
 # Import and include routers
-from app.api import auth
-from app.api import analyse
+from app.auth.api import auth
+from app.profile.api import analyse
 
 API="/api/v1"
 app.include_router(auth.router, prefix=API)
