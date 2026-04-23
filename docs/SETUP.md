@@ -43,16 +43,40 @@ cd careera
 ```bash
 cd backend
 
-# Create and activate virtual environment
+# Create virtual environment
 python -m venv venv
-source venv/bin/activate        # Windows: venv\Scripts\activate
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Set up environment variables
-cp .env.example .env            # Then fill in your credentials (see below)
 ```
+
+Activate the virtual environment:
+
+```bash
+# Linux / macOS
+source venv/bin/activate
+
+# Windows PowerShell
+venv\Scripts\Activate.ps1
+
+# Windows Command Prompt
+venv\Scripts\activate.bat
+```
+
+Then install dependencies and create your local env file:
+
+```bash
+# Linux / macOS
+pip install -r requirements.txt
+cp .env.example .env
+
+# Windows PowerShell
+pip install -r requirements.txt
+Copy-Item .env.example .env
+
+# Windows Command Prompt
+pip install -r requirements.txt
+copy .env.example .env
+```
+
+Then fill in your credentials in `backend/.env` (see below).
 
 **`backend/.env` variables:**
 
@@ -92,7 +116,12 @@ Interactive API docs are available at [http://localhost:8000/docs](http://localh
 
 **Option A: Docker (recommended)**
 
-Use the existing [docker-compose.yml](../docker-compose.yml) in the project root:
+Use the existing [docker-compose.yml](../docker-compose.yml) in the project root. It starts:
+
+- MongoDB on `localhost:27017`
+- Mongo Express on `http://localhost:8081` for browser-based database inspection
+
+Start the services with:
 
 ```bash
 docker-compose up -d       # Start
@@ -105,6 +134,8 @@ Update `MONGODB_URI` in `backend/.env`:
 ```env
 MONGODB_URI=mongodb://localhost:27017
 ```
+
+To visualize the database, open [http://localhost:8081](http://localhost:8081) after starting Docker. You can browse databases, collections, and documents there.
 
 **Option B: Local install**
 
@@ -168,7 +199,10 @@ curl http://localhost:8000
 
 # MongoDB (if using Docker)
 docker ps
-# → Should show careera-mongo container running
+# → Should show careera-mongo and careera-mongo-express running
+
+# Mongo Express
+# → Open http://localhost:8081 in your browser
 
 # Frontend
 # → Open http://localhost:3000 in your browser
@@ -184,7 +218,9 @@ docker-compose up -d
 
 # Terminal 2 — Backend
 cd backend
-source venv/bin/activate        # Windows: venv\Scripts\activate
+# Linux / macOS: source venv/bin/activate
+# Windows PowerShell: venv\Scripts\Activate.ps1
+# Windows Command Prompt: venv\Scripts\activate.bat
 uvicorn app.main:app --reload --port 8000
 
 # Terminal 3 — Frontend
