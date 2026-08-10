@@ -41,7 +41,7 @@ From any recommendation, generate a fully structured career path — a sequentia
 - **Interview nodes** — Q&A sessions where each answer is evaluated and scored by AI.
 
 **🏆 Gamification**
-Earn XP for completing nodes, level up your profile, and compete on a weekly, monthly, or all-time leaderboard.
+Earn XP for completing nodes, level up your profile, and compete on a monthly or all-time leaderboard.
 
 **👤 Profile Management**
 Update your CV, LinkedIn profile PDF, and career preferences at any time to re-run fresh analyses as you grow.
@@ -63,10 +63,26 @@ Update your CV, LinkedIn profile PDF, and career preferences at any time to re-r
 
 ## Documentation
 
+### 🏗️ Implementation
 | File | Contents |
 |---|---|
-| [docs/SETUP.md](./docs/SETUP.md) | Local setup, daily workflow, environment variables, API keys |
-| [docs/TECH_SPECS.md](./docs/TECH_SPECS.md) | Database schemas, API reference, project structure |
+| [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) | Stack diagram, session state machine, XP formula, node expansion strategy |
+| [docs/DB_SCHEMA.md](./docs/DB_SCHEMA.md) | All 8 MongoDB collections, field tables, indexes, enum values |
+| [docs/API_REFERENCE.md](./docs/API_REFERENCE.md) | Full endpoint reference — request/response shapes, error codes |
+| [backend/README.md](./backend/README.md) | Backend folder structure, development rules, and domain map |
+
+### 🛠️ Setup & Workflow
+| File | Contents |
+|---|---|
+| [docs/SETUP.md](./docs/SETUP.md) | Local development setup, environment variables, API keys |
+| [docs/CONTRIBUTING.md](./docs/CONTRIBUTING.md) | Pull Request structure and git commit templates |
+
+### 📊 Planning & Strategy
+| File | Contents |
+|---|---|
+| [docs/FEATURES.md](./docs/FEATURES.md) | Independent feature checklists for backend task assignment |
+| [docs/DECISIONS.md](./docs/DECISIONS.md) | Rationale for stack/database choices, rejected alternatives, future improvements |
+| [docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md) | Production Docker compose, CI/CD pipeline, and PaaS strategy |
 
 ---
 
@@ -74,7 +90,7 @@ Update your CV, LinkedIn profile PDF, and career preferences at any time to re-r
 
 Careera is a team project developed within the **[AppsBuild](https://appsbuild.community)** community — a group of developers building real-world products together. Contributions, feedback, and ideas are welcome.
 
-To get started contributing, check out the [setup guide](./docs/SETUP.md).
+To get started, check out the [Setup Guide](./docs/SETUP.md) and the [Contributing Guide](./docs/CONTRIBUTING.md).
 
 ---
 

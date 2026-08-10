@@ -1,240 +1,74 @@
 # ⚙️ Setup Guide
 
-Everything you need to get Careera running locally for development.
+Fastest path to getting Careera running locally for development.
 
 ---
 
-## Prerequisites
+## 1. Prerequisites
+- Node v18+
+- Python v3.11+
+- Docker (for MongoDB)
 
+---
+
+## 2. Start Database
+Use the provided `docker-compose.yml` to spin up MongoDB and Mongo Express (UI):
 ```bash
-node --version    # v18+
-python --version  # v3.11+
-docker --version  # Recommended for MongoDB
+docker-compose up -d
 ```
-
-Missing anything? [Node.js](https://nodejs.org/) | [Python](https://www.python.org/) | [Docker](https://www.docker.com/)
+*Mongo Express UI available at http://localhost:8081*
 
 ---
 
-## Project Structure (Quick View)
-
-```
-careera/
-├── frontend/          # Next.js app — Port 3000
-├── backend/           # FastAPI app — Port 8000
-└── docker-compose.yml # MongoDB container
-```
-
-Full structure breakdown is in [TECH_SPECS.md](./TECH_SPECS.md#project-structure).
-
----
-
-## Step 1 — Clone the repo
-
-```bash
-git clone https://github.com/appsbuild/careera.git
-cd careera
-```
-
----
-
-## Step 2 — Backend setup
-
+## 3. Start Backend
 ```bash
 cd backend
-
-# Create virtual environment
 python -m venv venv
+source venv/bin/activate  # (Windows: venv\Scripts\activate)
+
+pip install -r requirements.txt
+cp .env.example .env      # Fill in your keys
 ```
 
-Activate the virtual environment:
-
-```bash
-# Linux / macOS
-source venv/bin/activate
-
-# Windows PowerShell
-venv\Scripts\Activate.ps1
-
-# Windows Command Prompt
-venv\Scripts\activate.bat
-```
-
-Then install dependencies and create your local env file:
-
-```bash
-# Linux / macOS
-pip install -r requirements.txt
-cp .env.example .env
-
-# Windows PowerShell
-pip install -r requirements.txt
-Copy-Item .env.example .env
-
-# Windows Command Prompt
-pip install -r requirements.txt
-copy .env.example .env
-```
-
-Then fill in your credentials in `backend/.env` (see below).
-
-**`backend/.env` variables:**
-
+**`backend/.env` Requirements:**
 ```env
-# MongoDB
 MONGODB_URI=mongodb://localhost:27017
 DB_NAME=careera_db
-
-# Security
-SECRET_KEY=your-secret-key-here
-ALGORITHM=HS256
-
-# Google OAuth
-GOOGLE_CLIENT_ID=your-google-client-id
-GOOGLE_CLIENT_SECRET=your-google-client-secret
-
-# AI provider
-# Use the API key variable expected by the currently configured provider
-AI_PROVIDER_API_KEY=your-ai-provider-api-key
-
-# CORS
+JWT_SECRET=<your_jwt_secret>
+GOOGLE_CLIENT_ID=<your_google_client_id>
+LLM_API_KEY=<your_llm_key>
 ALLOWED_ORIGINS=http://localhost:3000
 ```
 
-**Start the backend:**
-
+Run the server:
 ```bash
 uvicorn app.main:app --reload --port 8000
 ```
-
-Visit [http://localhost:8000](http://localhost:8000) — you should see `{"message":"Careera API is running"}`.
-Interactive API docs are available at [http://localhost:8000/docs](http://localhost:8000/docs).
+*API Docs available at http://localhost:8000/docs*
 
 ---
 
-## Step 3 — MongoDB
-
-**Option A: Docker (recommended)**
-
-Use the existing [docker-compose.yml](../docker-compose.yml) in the project root. It starts:
-
-- MongoDB on `localhost:27017`
-- Mongo Express on `http://localhost:8081` for browser-based database inspection
-
-Start the services with:
-
-```bash
-docker-compose up -d       # Start
-docker-compose down        # Stop
-docker-compose logs -f     # View logs
-```
-
-Update `MONGODB_URI` in `backend/.env`:
-
-```env
-MONGODB_URI=mongodb://localhost:27017
-```
-
-To visualize the database, open [http://localhost:8081](http://localhost:8081) after starting Docker. You can browse databases, collections, and documents there.
-
-**Option B: Local install**
-
-Download from [mongodb.com](https://www.mongodb.com/try/download/community).
-
----
-
-## Step 4 — Frontend setup
-
+## 4. Start Frontend
 ```bash
 cd frontend
-
-# Install dependencies
 npm install
-
-# Set up environment variables
 cp .env.example .env.local
 ```
 
-**`frontend/.env.local` variables:**
-
+**`frontend/.env.local` Requirements:**
 ```env
-NEXT_PUBLIC_API_URL=http://localhost:8000
+NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
 ```
 
-**Start the frontend:**
-
+Run the server:
 ```bash
 npm run dev
 ```
-
-Visit [http://localhost:3000](http://localhost:3000).
-
----
-
-## Step 5 — Get Credentials
-
-**Google OAuth** (for user login)
-
-1. Go to [Google Cloud Console](https://console.cloud.google.com/)
-2. Create a new project
-3. Enable the **Google+ API**
-4. Create an **OAuth 2.0 Client ID** (Web application)
-5. Add authorized redirect URI: `http://localhost:3000/api/auth/callback/google`
-6. Copy the **Client ID** and **Client Secret** into `backend/.env`
-
-**AI provider API key** (for AI-powered features)
-
-1. Use the provider you want for AI features.
-2. Create an API key from that provider.
-3. Add it to `backend/.env` using the environment variable expected by your current backend configuration.
+*App available at http://localhost:3000*
 
 ---
 
-## Verification Checklist
-
-```bash
-# Backend
-curl http://localhost:8000
-# → {"message":"Careera API is running","version":"1.0.0"}
-
-# MongoDB (if using Docker)
-docker ps
-# → Should show careera-mongo and careera-mongo-express running
-
-# Mongo Express
-# → Open http://localhost:8081 in your browser
-
-# Frontend
-# → Open http://localhost:3000 in your browser
-```
-
----
-
-## Daily Development Workflow
-
-```bash
-# Terminal 1 — MongoDB
-docker-compose up -d
-
-# Terminal 2 — Backend
-cd backend
-# Linux / macOS: source venv/bin/activate
-# Windows PowerShell: venv\Scripts\Activate.ps1
-# Windows Command Prompt: venv\Scripts\activate.bat
-uvicorn app.main:app --reload --port 8000
-
-# Terminal 3 — Frontend
-cd frontend
-npm run dev
-```
-
----
-
-## Contributing
-
-1. Fork the repo
-2. Create a feature branch: `git checkout -b feature/your-feature`
-3. Commit your changes: `git commit -m "feat: describe your change"`
-4. Push and open a Pull Request
-
-Please follow the existing code structure and keep PRs focused. For technical context, refer to [TECH_SPECS.md](./TECH_SPECS.md).
+## 🔄 Daily Workflow
+1. `docker-compose up -d`
+2. `cd backend && source venv/bin/activate && uvicorn app.main:app --reload`
+3. `cd frontend && npm run dev`

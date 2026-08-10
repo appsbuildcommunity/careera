@@ -4,31 +4,26 @@ Keep contributions small, clear, and focused.
 
 ## Commits
 
-Use short commit messages in this format:
+We follow [Conventional Commits](https://www.conventionalcommits.org/).
 
-```text
-type: brief description
-type(scope): brief description
+To make this easy, we have provided a Git commit template. Configure your local repository to use it by running:
+
+```bash
+git config --local commit.template .gitmessage
 ```
 
-Examples:
+The template contains all the rules and types you need as comments (they won't be included in your final commit message).
 
-```text
-feat: add mongo-express for db visualization
-fix: correct backend environment variable name
-docs: update setup guide for Linux users
-chore: clean up docker configuration
-feat(backend): add profile update endpoint
+To use the template, simply run:
+```bash
+git commit
 ```
+This will open your terminal editor with the template pre-loaded.
 
-Common types:
-
-- `feat` for new functionality
-- `fix` for bug fixes
-- `docs` for documentation changes
-- `chore` for tooling, config, or maintenance
-- `refactor` for internal code cleanup without changing behavior
-- `test` for adding or updating tests
+For quick, simple commits, you can bypass the template by manually providing the message:
+```bash
+git commit -m "type: your brief message here"
+```
 
 ## Pull Requests
 
@@ -48,6 +43,6 @@ Use this structure in the PR description:
 ## Summary
 Briefly describe what changed and why.
 
-## How to review
-Mention the main files or areas to check.
+## Edits
+List the main areas or files that were edited.
 ```
