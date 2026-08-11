@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, NoReturn
 
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
@@ -24,7 +24,7 @@ class AppError(Exception):
         }
 
 
-def api_error(*, code: str, message: str, status_code: int) -> None:
+def api_error(*, code: str, message: str, status_code: int) -> NoReturn:
     """Raise an :class:`AppError` with the documented error shape."""
     raise AppError(code=code, message=message, status_code=status_code)
 
