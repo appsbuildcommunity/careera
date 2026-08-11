@@ -13,3 +13,8 @@ Thumbs.db
 
 # Logs
 logs/
+
+token-optimizer/
+AGENTS.md
+.venv/
+.pi/

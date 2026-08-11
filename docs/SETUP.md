@@ -23,10 +23,8 @@ docker-compose up -d
 ## 3. Start Backend
 ```bash
 cd backend
-python -m venv venv
-source venv/bin/activate  # (Windows: venv\Scripts\activate)
+poetry install                # installs runtime + dev deps into .venv (in-project)
 
-pip install -r requirements.txt
 cp .env.example .env      # Fill in your keys
 ```
 
