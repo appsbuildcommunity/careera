@@ -10,13 +10,22 @@ from app.share.service.llm.mock import MockChatModel
 
 __all__ = ["LLMProviderError", "get_llm_provider", "generate_json"]
 
-SUPPORTED_PROVIDERS: tuple[str, ...] = ("mock", "gemini", "openai", "anthropic")
+SUPPORTED_PROVIDERS: tuple[str, ...] = (
+    "mock",
+    "gemini",
+    "openai",
+    "anthropic",
+    "deepseek",
+)
 
 _MODEL_DEFAULTS: dict[str, str] = {
     "gemini": "gemini-1.5-flash",
     "openai": "gpt-4o-mini",
     "anthropic": "claude-sonnet-4-20250514",
+    "deepseek": "deepseek-chat",
 }
+
+_DEEPSEEK_DEFAULT_URL = "https://api.deepseek.com"
 
 
 def get_llm_provider() -> BaseChatModel:
@@ -24,6 +33,7 @@ def get_llm_provider() -> BaseChatModel:
     provider_name = os.getenv("LLM_PROVIDER", "mock").lower()
     api_key = os.getenv("LLM_API_KEY", "")
     model_name = os.getenv("LLM_MODEL", "")
+    llm_url = os.getenv("LLM_URL", "")
 
     if provider_name == "mock":
         return MockChatModel()
@@ -47,6 +57,16 @@ def get_llm_provider() -> BaseChatModel:
         return ChatOpenAI(
             model=model_name or _MODEL_DEFAULTS["openai"],
             api_key=SecretStr(api_key),
+            base_url=llm_url or None,
+        )
+
+    if provider_name == "deepseek":
+        from langchain_openai import ChatOpenAI
+
+        return ChatOpenAI(
+            model=model_name or _MODEL_DEFAULTS["deepseek"],
+            api_key=SecretStr(api_key),
+            base_url=llm_url or _DEEPSEEK_DEFAULT_URL,
         )
 
     if provider_name == "anthropic":
@@ -87,7 +107,8 @@ async def generate_json(
     class as a dict. Uses ``ainvoke`` so real providers (gemini / openai /
     anthropic) perform the network call through their native async path and
     the event loop is never blocked. The mock provider falls back to
-    LangChain's default async wrapper, which is cheap.
+    LangChain's default async wrapper, which is cheap. Real providers are
+    gemini / openai / anthropic / deepseek.
     """
     if model is None:
         model = get_llm_provider()

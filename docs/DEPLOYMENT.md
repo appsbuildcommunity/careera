@@ -35,7 +35,10 @@ Regardless of where you deploy, the following environment variables must be conf
 MONGODB_URL=mongodb+srv://<user>:<password>@cluster.mongodb.net/careera
 JWT_SECRET=<super_secure_random_string>
 GOOGLE_CLIENT_ID=<your_google_oauth_client_id>
+LLM_PROVIDER=mock            # mock | gemini | openai | anthropic | deepseek
 LLM_API_KEY=<your_llm_provider_key>
+LLM_MODEL=                   # optional; defaulted per provider
+LLM_URL=                     # optional base URL for OpenAI-compatible providers (deepseek)
 ALLOWED_ORIGINS=https://careera.vercel.app
 ```
 

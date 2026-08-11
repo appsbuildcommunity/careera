@@ -34,7 +34,10 @@ MONGODB_URI=mongodb://localhost:27017
 DB_NAME=careera_db
 JWT_SECRET=<your_jwt_secret>
 GOOGLE_CLIENT_ID=<your_google_client_id>
+LLM_PROVIDER=mock            # mock | gemini | openai | anthropic | deepseek
 LLM_API_KEY=<your_llm_key>
+LLM_MODEL=                   # optional; defaulted per provider
+LLM_URL=                     # optional base URL for OpenAI-compatible providers (deepseek)
 ALLOWED_ORIGINS=http://localhost:3000
 ```
 
