@@ -1,3 +1,4 @@
+import json
 import os
 from typing import Any, Optional
 
@@ -92,6 +93,36 @@ def _dump_result(result: Any) -> dict[str, Any]:
     return dict(result)
 
 
+def _structured_runnable(
+    model: BaseChatModel,
+    system: str,
+    response_model: type[BaseModel],
+) -> tuple[Any, str]:
+    """Return ``(structured_output_runnable, system_prompt)`` for the model.
+
+    OpenAI-compatible models (``openai`` / ``deepseek``) default to the
+    ``json_schema`` response_format, which DeepSeek's reasoning models reject.
+    They also reject ``function_calling`` (tool calling). The supported path is
+    ``json_mode`` with the JSON schema embedded in the system prompt. Gemini /
+    Anthropic / mock use their native ``with_structured_output``.
+    """
+    try:
+        from langchain_openai import ChatOpenAI
+    except ImportError:
+        return model.with_structured_output(response_model), system
+    if isinstance(model, ChatOpenAI):
+        schema = json.dumps(response_model.model_json_schema())
+        augmented = (
+            f"{system}\n\nReturn ONLY valid JSON matching the following JSON "
+            f"Schema, with no additional fields:\n{schema}"
+        )
+        return (
+            model.with_structured_output(response_model, method="json_mode"),
+            augmented,
+        )
+    return model.with_structured_output(response_model), system
+
+
 async def generate_json(
     *,
     model: Optional[BaseChatModel] = None,
@@ -102,19 +133,22 @@ async def generate_json(
     """Generate a validated JSON object using a LangChain chat model.
 
     If ``model`` is omitted it is created via ``get_llm_provider()``.
-    Runs ``with_structured_output(response_model)`` — the provider's native
-    tool-calling path — and returns the result validated against the Pydantic
-    class as a dict. Uses ``ainvoke`` so real providers (gemini / openai /
-    anthropic) perform the network call through their native async path and
-    the event loop is never blocked. The mock provider falls back to
-    LangChain's default async wrapper, which is cheap. Real providers are
-    gemini / openai / anthropic / deepseek.
+    Runs ``with_structured_output(response_model)`` and returns the result
+    validated against the Pydantic class as a dict. Uses ``ainvoke`` so real
+    providers (gemini / openai / anthropic / deepseek) perform the network call
+    through their native async path and the event loop is never blocked. The
+    mock provider falls back to LangChain's default async wrapper, which is
+    cheap.
     """
     if model is None:
         model = get_llm_provider()
-    messages = [SystemMessage(content=system), HumanMessage(content=user)]
+    structured, system_prompt = _structured_runnable(model, system, response_model)
+    messages = [
+        SystemMessage(content=system_prompt),
+        HumanMessage(content=user),
+    ]
     try:
-        result = await model.with_structured_output(response_model).ainvoke(messages)
+        result = await structured.ainvoke(messages)
         return _dump_result(result)
     except Exception as exc:
         raise LLMProviderError(f"LLM call failed: {exc}") from exc

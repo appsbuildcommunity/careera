@@ -1,4 +1,5 @@
 import asyncio
+from typing import Any
 
 import pytest
 from pydantic import BaseModel, Field
@@ -21,6 +22,7 @@ def clear_llm_env(monkeypatch):
     monkeypatch.delenv("LLM_PROVIDER", raising=False)
     monkeypatch.delenv("LLM_API_KEY", raising=False)
     monkeypatch.delenv("LLM_MODEL", raising=False)
+    monkeypatch.delenv("LLM_URL", raising=False)
 
 
 def test_response_model_is_required():
@@ -106,3 +108,57 @@ def test_failure_is_wrapped_in_llm_provider_error():
             )
         )
     assert isinstance(excinfo.value.__cause__, RuntimeError)
+
+
+def test_openai_compatible_model_uses_json_mode_with_schema(monkeypatch):
+    from langchain_openai import ChatOpenAI
+    from pydantic import SecretStr
+
+    captured: dict[str, Any] = {}
+
+    class _StubRunnable:
+        async def ainvoke(self, messages):
+            captured["system_content"] = messages[0].content
+            return MovieInfo(name="Inception", year=2010)
+
+    def fake_with_structured_output(self, schema, **kwargs):
+        captured["method"] = kwargs.get("method")
+        return _StubRunnable()
+
+    monkeypatch.setattr(
+        ChatOpenAI, "with_structured_output", fake_with_structured_output
+    )
+
+    model = ChatOpenAI(model="x", api_key=SecretStr("dummy"))
+    result = asyncio.run(
+        generate_json(
+            model=model,
+            system="Be precise.",
+            user="u",
+            response_model=MovieInfo,
+        )
+    )
+
+    assert result == {"name": "Inception", "year": 2010}
+    assert captured["method"] == "json_mode"
+    assert '"name"' in captured["system_content"]
+    assert "JSON Schema" in captured["system_content"]
+
+
+def test_non_openai_model_keeps_plain_system_prompt():
+    class _StubRunnable:
+        async def ainvoke(self, messages):
+            assert messages[0].content == "s"
+            assert "JSON Schema" not in messages[0].content
+            return MovieInfo(name="Inception", year=2010)
+
+    class _StubModel:
+        def with_structured_output(self, schema):
+            return _StubRunnable()
+
+    result = asyncio.run(
+        generate_json(
+            model=_StubModel(), system="s", user="u", response_model=MovieInfo  # type: ignore[arg-type]
+        )
+    )
+    assert result == {"name": "Inception", "year": 2010}
