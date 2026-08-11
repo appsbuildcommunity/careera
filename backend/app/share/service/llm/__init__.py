@@ -66,7 +66,13 @@ def get_llm_provider() -> BaseChatModel:
     )
 
 
-def generate_json(
+def _dump_result(result: Any) -> dict[str, Any]:
+    if isinstance(result, BaseModel):
+        return result.model_dump()
+    return dict(result)
+
+
+async def generate_json(
     *,
     model: Optional[BaseChatModel] = None,
     system: str,
@@ -78,15 +84,16 @@ def generate_json(
     If ``model`` is omitted it is created via ``get_llm_provider()``.
     Runs ``with_structured_output(response_model)`` — the provider's native
     tool-calling path — and returns the result validated against the Pydantic
-    class as a dict.
+    class as a dict. Uses ``ainvoke`` so real providers (gemini / openai /
+    anthropic) perform the network call through their native async path and
+    the event loop is never blocked. The mock provider falls back to
+    LangChain's default async wrapper, which is cheap.
     """
     if model is None:
         model = get_llm_provider()
     messages = [SystemMessage(content=system), HumanMessage(content=user)]
     try:
-        result = model.with_structured_output(response_model).invoke(messages)
-        if isinstance(result, BaseModel):
-            return result.model_dump()
-        return dict(result)
+        result = await model.with_structured_output(response_model).ainvoke(messages)
+        return _dump_result(result)
     except Exception as exc:
         raise LLMProviderError(f"LLM call failed: {exc}") from exc

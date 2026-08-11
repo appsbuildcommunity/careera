@@ -1,3 +1,5 @@
+import asyncio
+
 import pytest
 from pydantic import BaseModel, Field
 
@@ -23,33 +25,39 @@ def clear_llm_env(monkeypatch):
 
 def test_response_model_is_required():
     with pytest.raises(TypeError):
-        generate_json(system="s", user="u")  # type: ignore[call-arg]
+        asyncio.run(generate_json(system="s", user="u"))  # type: ignore[call-arg]
 
 
 def test_model_is_keyword_only():
     with pytest.raises(TypeError):
-        generate_json(get_llm_provider(), system="s", user="u", response_model=TitleOnly)  # type: ignore[call-arg]
+        asyncio.run(
+            generate_json(get_llm_provider(), system="s", user="u", response_model=TitleOnly)  # type: ignore[call-arg]
+        )
 
 
 def test_auto_instantiates_model_when_omitted():
-    result = generate_json(system="s", user="career path", response_model=TitleOnly)
+    result = asyncio.run(
+        generate_json(system="s", user="career path", response_model=TitleOnly)
+    )
     assert isinstance(result, dict)
     assert "nodes" in result
 
 
 def test_explicit_mock_model():
-    result = generate_json(
-        model=MockChatModel(),
-        system="s",
-        user="interview template",
-        response_model=TitleOnly,
+    result = asyncio.run(
+        generate_json(
+            model=MockChatModel(),
+            system="s",
+            user="interview template",
+            response_model=TitleOnly,
+        )
     )
     assert "questions" in result
 
 
 def test_base_model_result_is_dumped():
     class _StubRunnable:
-        def invoke(self, messages):
+        async def ainvoke(self, messages):
             return MovieInfo(name="Inception", year=2010)
 
     class _StubModel:
@@ -57,30 +65,34 @@ def test_base_model_result_is_dumped():
             assert schema is MovieInfo
             return _StubRunnable()
 
-    result = generate_json(
-        model=_StubModel(), system="s", user="u", response_model=MovieInfo  # type: ignore[arg-type]
+    result = asyncio.run(
+        generate_json(
+            model=_StubModel(), system="s", user="u", response_model=MovieInfo  # type: ignore[arg-type]
+        )
     )
     assert result == {"name": "Inception", "year": 2010}
 
 
 def test_dict_result_is_passed_through():
     class _StubRunnable:
-        def invoke(self, messages):
+        async def ainvoke(self, messages):
             return {"name": "Inception", "year": 2010}
 
     class _StubModel:
         def with_structured_output(self, schema):
             return _StubRunnable()
 
-    result = generate_json(
-        model=_StubModel(), system="s", user="u", response_model=MovieInfo  # type: ignore[arg-type]
+    result = asyncio.run(
+        generate_json(
+            model=_StubModel(), system="s", user="u", response_model=MovieInfo  # type: ignore[arg-type]
+        )
     )
     assert result == {"name": "Inception", "year": 2010}
 
 
 def test_failure_is_wrapped_in_llm_provider_error():
     class _BoomRunnable:
-        def invoke(self, messages):
+        async def ainvoke(self, messages):
             raise RuntimeError("boom")
 
     class _BoomModel:
@@ -88,5 +100,9 @@ def test_failure_is_wrapped_in_llm_provider_error():
             return _BoomRunnable()
 
     with pytest.raises(LLMProviderError, match="boom") as excinfo:
-        generate_json(model=_BoomModel(), system="s", user="u", response_model=TitleOnly)  # type: ignore[arg-type]
+        asyncio.run(
+            generate_json(
+                model=_BoomModel(), system="s", user="u", response_model=TitleOnly  # type: ignore[arg-type]
+            )
+        )
     assert isinstance(excinfo.value.__cause__, RuntimeError)
