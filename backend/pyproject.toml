@@ -41,3 +41,7 @@ dev = [
     "pytest (>=9.1.1,<10.0.0)",
     "pyright (>=1.1.411,<2.0.0)"
 ]
+
+[tool.pyright]
+venvPath = "."
+venv = ".venv"
