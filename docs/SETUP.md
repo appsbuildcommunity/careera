@@ -47,6 +47,14 @@ uvicorn app.main:app --reload --port 8000
 ```
 *API Docs available at http://localhost:8000/docs*
 
+**Backend tests:**
+```bash
+poetry run pytest              # unit tests (integration tests are deselected)
+poetry run pytest -m integration -s   # live LLM tests — requires LLM_API_KEY
+```
+*Live integration tests make a real LLM API call and write the result to
+`backend/integration_results/career_analysis_live.json`.*
+
 ---
 
 ## 4. Start Frontend
