@@ -9,9 +9,9 @@
 
 | Layer | Choice | Rationale |
 |---|---|---|
-| **Backend** | FastAPI (Python) | Fast to build, natively async, auto-generates OpenAPI docs (`/docs`) which serve as the exact contract for AI frontend generation. |
+| **Backend** | FastAPI (Python) | Fast to build, natively async, auto-generates OpenAPI docs (`/docs`) which serve as the exact contract for AI frontend generation. Managed via Poetry. |
 | **Database** | MongoDB | LLM output is deeply nested, document-shaped data (variable fields, arrays of objects). A relational schema would require many joins and complex migrations every time an LLM prompt changes. MongoDB embraces this flexibility natively. |
-| **LLM Provider** | TBD | Will evaluate options (e.g. Gemini Flash) based on cost, speed, and JSON reliability. |
+| **LLM Provider** | Multi-Provider via LangChain (`mock`, `gemini`, `openai`, `anthropic`, `deepseek`) | Provider-agnostic abstraction layer with deterministic offline mock engine for testing and configurable cloud providers for production. |
 | **Deployment** | TBD | Will evaluate free-tier platforms suitable for FastAPI, Next.js, and MongoDB. |
 
 ---

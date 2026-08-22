@@ -13,7 +13,8 @@ backend/app/
 ├── career/              # Analyses & Career Paths collections
 ├── project/             # Project Templates & Sessions
 ├── interview/           # Interview Templates & Sessions
-└── session/             # Cross-domain session history
+├── session/             # Cross-domain session history
+└── share/               # Cross-cutting shared services (LLM engine, API errors)
 ```
 
 ## Development Rules
@@ -49,6 +50,7 @@ Inside each domain folder, strictly separate concerns:
 
 For detailed backend context, refer to the main documentation:
 - 📖 [API Reference](../docs/API_REFERENCE.md) — All endpoints, requests, and responses
+- 🤖 [LLM Integration Guide](../docs/LLM_INTEGRATION.md) — LLM provider configuration and service usage
 - 💾 [Database Schema](../docs/DB_SCHEMA.md) — MongoDB collections and field types
 - 🏗️ [Architecture](../docs/ARCHITECTURE.md) — Session state machines and XP formula
 - ✅ [Feature Tracker](../docs/FEATURES.md) — Task breakdown for backend development

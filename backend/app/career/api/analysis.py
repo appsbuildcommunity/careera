@@ -16,8 +16,8 @@ router = APIRouter(prefix="/careers", tags=["Career Analysis"])
 
 @router.post("/analyze", response_model=AnalyzeResponse, status_code=202)
 async def create_analysis(
+    background_tasks: BackgroundTasks,
     request: Optional[AnalyzeRequest] = Body(default=None),
-    background_tasks: BackgroundTasks = BackgroundTasks(),
     current_user: dict = Depends(get_current_user),
 ) -> AnalyzeResponse:
     return await analysis_service.create_analysis(

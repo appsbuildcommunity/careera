@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 
 from fastapi import BackgroundTasks
@@ -74,7 +74,7 @@ async def create_analysis(
     result = await db.analyses.insert_one(
         {
             "user_id": to_object_id(user_id),
-            "created_at": datetime.utcnow(),
+            "created_at": datetime.now(timezone.utc),
             "status": AnalysisStatus.PENDING.value,
         }
     )
@@ -179,7 +179,7 @@ def _to_summary(doc: dict) -> AnalysisSummary:
     return AnalysisSummary(
         analysis_id=str(doc["_id"]),
         status=AnalysisStatus(doc["status"]),
-        created_at=doc.get("created_at") or datetime.utcnow(),
+        created_at=doc.get("created_at") or datetime.now(timezone.utc),
         profile_insight=_insight_if_ready(doc),
         recommendations_count=len(doc.get("recommendations") or []),
     )
@@ -195,7 +195,7 @@ def _to_detail(doc: dict) -> AnalysisDetail:
     return AnalysisDetail(
         analysis_id=str(doc["_id"]),
         status=AnalysisStatus(doc["status"]),
-        created_at=doc.get("created_at") or datetime.utcnow(),
+        created_at=doc.get("created_at") or datetime.now(timezone.utc),
         profile_insight=_insight_if_ready(doc),
         recommendations=recommendations,
     )

@@ -23,7 +23,7 @@
 graph LR
   FE["Frontend\nNext.js 14"] -->|REST /api/v1| BE["Backend\nFastAPI (Python)"]
   BE --> DB[("MongoDB")]
-  BE --> LLM["LLM API (TBD)"]
+  BE --> LLM["LLM Service\nLangChain Multi-Provider"]
   BE --> Auth["Google OAuth 2.0"]
 ```
 

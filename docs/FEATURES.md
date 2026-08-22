@@ -21,8 +21,8 @@ This document splits the backend and deployment work into independent, paralleli
 
 ### 2. Career Analysis & Path Generation
 *Deals with `analyses` and `career_paths` collections. Can be mocked initially without LLM.*
-- [ ] `POST /careers/analyze` (Trigger async LLM generation)
-- [ ] `GET /careers/analyses` & `GET /careers/analyses/{id}` (Polling)
+- [x] `POST /careers/analyze` (Trigger async LLM generation)
+- [x] `GET /careers/analyses` & `GET /careers/analyses/{id}` (Polling)
 - [ ] `POST /careers/paths` (Generate path from recommendation)
 - [ ] `GET /careers/paths` & `GET /careers/paths/{id}`
 - [ ] `PATCH /careers/paths/{id}/archive`
