@@ -67,6 +67,7 @@ Update your CV, LinkedIn profile PDF, and career preferences at any time to re-r
 | File | Contents |
 |---|---|
 | [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) | Stack diagram, session state machine, XP formula, node expansion strategy |
+| [docs/LLM_INTEGRATION.md](./docs/LLM_INTEGRATION.md) | LLM generation layer, provider setup, async architecture, and mock engine |
 | [docs/DB_SCHEMA.md](./docs/DB_SCHEMA.md) | All 8 MongoDB collections, field tables, indexes, enum values |
 | [docs/API_REFERENCE.md](./docs/API_REFERENCE.md) | Full endpoint reference — request/response shapes, error codes |
 | [backend/README.md](./backend/README.md) | Backend folder structure, development rules, and domain map |
