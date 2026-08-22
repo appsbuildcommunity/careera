@@ -2,7 +2,11 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.database.connection import connect_to_mongo, close_mongo_connection, get_db_stats
 
+from app.share.api.errors import register_error_handler
+
 app = FastAPI(title="Careera API", version="1.0.0")
+
+register_error_handler(app)
 
 # CORS
 app.add_middleware(
@@ -46,5 +50,7 @@ async def health_check():
 
 # Import and include routers
 from app.auth.api import auth
+from app.career.api import analysis as career_analysis
 
 app.include_router(auth.router, prefix="/api/v1")
+app.include_router(career_analysis.router, prefix="/api/v1")

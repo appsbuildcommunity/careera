@@ -61,3 +61,6 @@ Thumbs.db
 *.cache
 .temp/
 .github/
+
+# Integration test artifacts
+integration_results/
