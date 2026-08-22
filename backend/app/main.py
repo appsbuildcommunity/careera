@@ -1,31 +1,35 @@
+import os
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.database.connection import connect_to_mongo, close_mongo_connection, get_db_stats
 
 from app.share.api.errors import register_error_handler
 
-app = FastAPI(title="Careera API", version="1.0.0")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await connect_to_mongo()
+    yield
+    await close_mongo_connection()
+
+app = FastAPI(title="Careera API", version="1.0.0", lifespan=lifespan)
 
 register_error_handler(app)
 
 # CORS
+allowed_origins = [
+    origin.strip()
+    for origin in os.getenv("ALLOWED_ORIGINS", "http://localhost:3000").split(",")
+    if origin.strip()
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# Startup event - connect to MongoDB
-@app.on_event("startup")
-async def startup_event():
-    await connect_to_mongo()
-
-# Shutdown event - close MongoDB connection
-@app.on_event("shutdown")
-async def shutdown_event():
-    await close_mongo_connection()
 
 @app.get("/")
 def root():
