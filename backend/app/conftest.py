@@ -60,6 +60,7 @@ class FakeDB:
     def __init__(self) -> None:
         self.users = FakeCollection()
         self.analyses = FakeCollection()
+        self.career_paths = FakeCollection()
 
 
 @pytest.fixture
@@ -69,6 +70,7 @@ def fake_db(monkeypatch):
     async def _get_database() -> FakeDB:
         return db
 
+    monkeypatch.setattr("app.database.connection.get_database", _get_database)
     monkeypatch.setattr("app.career.service.analysis.get_database", _get_database)
     monkeypatch.setattr("app.profile.service.profile.get_database", _get_database)
     return db
