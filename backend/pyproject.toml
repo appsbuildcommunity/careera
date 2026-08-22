@@ -1,0 +1,47 @@
+[tool.poetry]
+package-mode = false
+
+[project]
+name = "careera-api"
+version = "0.1.0"
+description = "AI-powered career guidance platform — analyze your profile, generate personalized learning paths, and level up your career."
+authors = [
+    {name = "Your Name",email = "you@example.com"}
+]
+readme = "README.md"
+requires-python = ">=3.12,<4.0"
+dependencies = [
+    "fastapi (>=0.141.1,<0.142.0)",
+    "uvicorn[standard] (==0.27.0)",
+    "motor (==3.6.0)",
+    "pydantic (==2.13.4)",
+    "python-jose[cryptography] (==3.3.0)",
+    "python-multipart (==0.0.6)",
+    "google-genai (==2.17.0)",
+    "pypdf2 (==3.0.1)",
+    "python-dotenv (==1.0.0)",
+    "google-auth (==2.56.3)",
+    "passlib[bcrypt] (==1.7.4)",
+    "openai (==2.53.0)",
+    "anthropic (==0.121.0)",
+    "httpx (>=0.28.1,<0.29.0)",
+    "langchain-core (==1.5.3)",
+    "langchain-openai (==1.4.3)",
+    "langchain-anthropic (==1.5.4)",
+    "langchain-google-genai (==4.3.3)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[dependency-groups]
+dev = [
+    "pytest (>=9.1.1,<10.0.0)",
+    "pyright (>=1.1.411,<2.0.0)"
+]
+
+[tool.pyright]
+venvPath = "."
+venv = ".venv"
