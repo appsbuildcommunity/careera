@@ -46,6 +46,48 @@ Inside each domain folder, strictly separate concerns:
 
 ---
 
+## 🧪 Testing Guidelines & Instructions
+
+Backend tests are written using `pytest` and `pytest-asyncio`. Tests are divided into **fast in-memory unit tests** and **live integration tests**.
+
+### 1. Running Unit Tests (Default)
+Unit tests run entirely in-memory using the `FakeDB` test fixtures provided in `app/conftest.py`. They do not require MongoDB or any API keys.
+
+```bash
+# Run all unit tests
+poetry run pytest
+
+# Run with verbose output and print statements
+poetry run pytest -v -s
+
+# Run tests for a specific domain
+poetry run pytest app/auth/
+poetry run pytest app/profile/
+poetry run pytest app/career/
+poetry run pytest app/share/
+
+# Run a single test file
+poetry run pytest app/profile/service/test_profile.py -v
+
+# Run a specific test case by name
+poetry run pytest app/profile/service/test_profile.py -k "test_get_profile"
+```
+
+### 2. Running Live Integration Tests
+Integration tests make real external LLM API calls and write output to `backend/integration_results/`. They require live API keys in `backend/.env`.
+
+```bash
+# Run integration tests only
+poetry run pytest -m integration -s
+```
+
+### 3. Test Standards for Contributors
+*   **Fixture Usage:** Always use the `fake_db` fixture from `conftest.py` for database mocking.
+*   **No Real Network Calls in Unit Tests:** All unit tests must be self-contained and run in milliseconds.
+*   **Coverage Rule:** Every new service function, data model validation, and endpoint must include corresponding unit tests in its domain's test files.
+
+---
+
 ## References
 
 For detailed backend context, refer to the main documentation:
