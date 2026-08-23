@@ -51,10 +51,10 @@ Inside each domain folder, strictly separate concerns:
 Backend tests are written using `pytest` and `pytest-asyncio`. Tests are divided into **fast in-memory unit tests** and **live integration tests**.
 
 ### 1. Running Unit Tests (Default)
-Unit tests run entirely in-memory using the `FakeDB` test fixtures provided in `app/conftest.py`. They do not require MongoDB or any API keys.
+Unit tests run entirely in-memory using the `FakeDB` test fixtures provided in `app/conftest.py` and `MockChatModel`. They do not require MongoDB or any API keys, run in ~1–2s, and cost $0.00. `pytest.ini` automatically ignores integration tests by default.
 
 ```bash
-# Run all unit tests
+# Run all unit tests (fast, offline, mocked)
 poetry run pytest
 
 # Run with verbose output and print statements
@@ -74,14 +74,31 @@ poetry run pytest app/profile/service/test_profile.py -k "test_get_profile"
 ```
 
 ### 2. Running Live Integration Tests
-Integration tests make real external LLM API calls and write output to `backend/integration_results/`. They require live API keys in `backend/.env`.
+Integration tests make real external LLM API calls against the configured cloud provider (`LLM_PROVIDER`), validate the response against Pydantic blueprints, and save the live JSON output to `backend/integration_results/career_analysis_live.json` for developer inspection.
+
+Requires `LLM_PROVIDER` and `LLM_API_KEY` to be set in `backend/.env` (skips automatically if unset).
 
 ```bash
-# Run integration tests only
+# Run live integration tests only
 poetry run pytest -m integration -s
+
+# Inspect the saved live AI analysis result
+cat integration_results/career_analysis_live.json
 ```
 
-### 3. Test Standards for Contributors
+### 3. Relevant Types of Calls to Test
+
+When implementing features, tests must cover the following categories of operations:
+
+| Category | Target Endpoints / Functions | What to Test |
+|---|---|---|
+| **Auth & Security** | `POST /auth/google`, `POST /auth/refresh`, `POST /auth/logout` | Token signing, user upsert on login, blacklist revocation in MongoDB `refresh_tokens`, expired token rejection, middleware protection (`get_current_user`). |
+| **Profile & Files** | `GET /users/me`, `POST /users/me/upload-cv`, `PATCH /users/me/preferences` | User profile retrieval, PDF file validation and text extraction via `pypdf`, partial preference updates, error on non-PDF formats. |
+| **LLM Generation** | Domain services using `generate_json()` | Prompt construction, schema validation with Pydantic blueprints, error propagation (`LLMProviderError`), fallback behavior with `MockChatModel`. |
+| **Async Background Tasks** | `POST /careers/analyze`, `POST /careers/paths` | `BackgroundTasks` lifecycle (`PENDING` → `READY` or `FAILED`), polling accuracy, and background error handling. |
+| **Database & Multi-Tenancy** | Domain CRUD operations | Multi-tenant isolation (`user_id` filtering), sorting newest-first, and ensuring cross-domain calls use service layers rather than raw foreign queries. |
+
+### 4. Test Standards for Contributors
 *   **Fixture Usage:** Always use the `fake_db` fixture from `conftest.py` for database mocking.
 *   **No Real Network Calls in Unit Tests:** All unit tests must be self-contained and run in milliseconds.
 *   **Coverage Rule:** Every new service function, data model validation, and endpoint must include corresponding unit tests in its domain's test files.

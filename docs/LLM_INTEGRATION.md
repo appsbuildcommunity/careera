@@ -76,11 +76,11 @@ Configure the provider in `backend/.env`:
 LLM_PROVIDER=mock
 ```
 
-#### 2. Google Gemini (Fast & Cost-Effective)
+#### 2. Google Gemini (Fast & Cost-Effective — Default)
 ```env
 LLM_PROVIDER=gemini
 LLM_API_KEY=AIzaSy...
-LLM_MODEL=gemini-1.5-flash
+LLM_MODEL=gemini-3.6-flash
 ```
 
 #### 3. DeepSeek (Low-Cost)
@@ -127,13 +127,36 @@ When building a new domain feature (e.g., Feature 4 Project Grading or Feature 5
 
 ---
 
-## 🚦 Testing
+## 🚦 Testing: Unit Tests vs. Live Integration Tests
 
-* **Fast Mock Unit Tests (Default)**:
-  ```bash
-  poetry run pytest
-  ```
-* **Live Integration Tests (Real API Calls)**:
-  ```bash
-  LLM_PROVIDER=gemini LLM_API_KEY=your_key poetry run pytest -m integration -s
-  ```
+Careera provides two testing tiers configured via `backend/pytest.ini`:
+
+| Tier | Command | Speed & Cost | What it Does |
+|---|---|---|---|
+| **Unit Tests** *(Default)* | `poetry run pytest` | ⚡ **~1–2s** / **$0.00** | Uses in-memory `MockChatModel` & `FakeDB`. Runs 100% offline with zero API keys. `pytest.ini` automatically ignores integration tests by default. |
+| **Live Integration Tests** | `poetry run pytest -m integration -s` | ⏳ **~10–15s** / Real Quota | Sends real HTTPS requests to the configured cloud provider (`LLM_PROVIDER`), parses output against Pydantic blueprints, and saves the live JSON to `backend/integration_results/career_analysis_live.json`. |
+
+### Running the Live Integration Test:
+```bash
+# 1. Ensure LLM_PROVIDER and LLM_API_KEY are set in backend/.env
+# (e.g. gemini, deepseek, openai, or anthropic)
+
+# 2. Run the integration test:
+poetry run pytest -m integration -s
+
+# 3. View the generated live JSON result:
+cat backend/integration_results/career_analysis_live.json
+```
+
+### Domain LLM Calls to Test:
+
+| Feature Area | Call Type | Trigger Marker | Response Blueprint | Description |
+|---|---|---|---|---|
+| **Career Analysis** *(Feature 2)* | Analysis Generation | `"career analysis"` | `AnalysisLLMOutput` | CV & LinkedIn synthesis, skill gap matching, ranked career directions. |
+| **Career Roadmap** *(Feature 2)* | Path Generation | `"career path"` | `CareerPathLLMOutput` | Multi-step milestone graph (learning, project, and interview nodes). |
+| **Node Expansion** *(Feature 3)* | Learning Content | `"learning template"` | `LearningTemplateLLMOutput` | Curriculum, key concepts, reading guides, and curated resources. |
+| **Node Expansion** *(Feature 3)* | Project Boilerplate | `"project template"` | `ProjectTemplateLLMOutput` | Task breakdown, subtask acceptance criteria, and model solution. |
+| **Node Expansion** *(Feature 3)* | Interview Questions | `"interview template"` | `InterviewTemplateLLMOutput` | Technical question sequences, grading rubric, and model answers. |
+| **Project Session** *(Feature 4)* | Code Evaluation | `"project evaluation"` | `ProjectEvaluationOutput` | Automated grading, criteria verification, pass/fail status, and line-by-line feedback. |
+| **Interview Session** *(Feature 5)* | Answer Evaluation | `"interview evaluation"` | `InterviewEvaluationOutput` | Real-time answer scoring, clarity evaluation, and constructive feedback. |
+

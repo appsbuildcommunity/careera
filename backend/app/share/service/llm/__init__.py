@@ -20,7 +20,7 @@ SUPPORTED_PROVIDERS: tuple[str, ...] = (
 )
 
 _MODEL_DEFAULTS: dict[str, str] = {
-    "gemini": "gemini-1.5-flash",
+    "gemini": "gemini-3.6-flash",
     "openai": "gpt-4o-mini",
     "anthropic": "claude-sonnet-4-20250514",
     "deepseek": "deepseek-chat",

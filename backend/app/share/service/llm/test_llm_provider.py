@@ -64,7 +64,7 @@ def test_model_override(monkeypatch, provider_name):
 
 def test_default_models_when_model_unset(monkeypatch):
     defaults = {
-        "gemini": "gemini-1.5-flash",
+        "gemini": "gemini-3.6-flash",
         "openai": "gpt-4o-mini",
         "anthropic": "claude-sonnet-4-20250514",
         "deepseek": "deepseek-chat",
