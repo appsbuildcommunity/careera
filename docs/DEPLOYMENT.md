@@ -33,8 +33,13 @@ Regardless of where you deploy, the following environment variables must be conf
 **Backend (Render):**
 ```env
 MONGODB_URL=mongodb+srv://<user>:<password>@cluster.mongodb.net/careera
-JWT_SECRET=<super_secure_random_string>
+DB_NAME=careera_db
+SECRET_KEY=<super_secure_random_string>
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=15
+REFRESH_TOKEN_EXPIRE_DAYS=7
 GOOGLE_CLIENT_ID=<your_google_oauth_client_id>
+GOOGLE_CLIENT_SECRET=<your_google_oauth_client_secret>
 LLM_PROVIDER=mock            # mock | gemini | openai | anthropic | deepseek
 LLM_API_KEY=<your_llm_provider_key>
 LLM_MODEL=                   # optional; defaulted per provider

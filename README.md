@@ -76,6 +76,7 @@ Update your CV, LinkedIn profile PDF, and career preferences at any time to re-r
 | File | Contents |
 |---|---|
 | [docs/SETUP.md](./docs/SETUP.md) | Local development setup, environment variables, API keys |
+| [docs/AUTH_SETUP.md](./docs/AUTH_SETUP.md) | Google OAuth 2.0 setup, frontend/backend synchronization, and JWT tokens |
 | [docs/CONTRIBUTING.md](./docs/CONTRIBUTING.md) | Pull Request structure and git commit templates |
 
 ### 📊 Planning & Strategy

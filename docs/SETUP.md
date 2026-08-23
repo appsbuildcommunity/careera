@@ -32,14 +32,21 @@ cp .env.example .env      # Fill in your keys
 ```env
 MONGODB_URI=mongodb://localhost:27017
 DB_NAME=careera_db
-JWT_SECRET=<your_jwt_secret>
+SECRET_KEY=<your_jwt_secret_key>
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=15
+REFRESH_TOKEN_EXPIRE_DAYS=7
 GOOGLE_CLIENT_ID=<your_google_client_id>
+GOOGLE_CLIENT_SECRET=<your_google_client_secret>
 LLM_PROVIDER=mock            # mock | gemini | openai | anthropic | deepseek
 LLM_API_KEY=<your_llm_key>
 LLM_MODEL=                   # optional; defaulted per provider
 LLM_URL=                     # optional base URL for OpenAI-compatible providers (deepseek)
 ALLOWED_ORIGINS=http://localhost:3000
 ```
+
+> 💡 For full Google OAuth 2.0 configuration instructions, see [docs/AUTH_SETUP.md](./AUTH_SETUP.md).  
+> 🤖 For detailed LLM provider configuration (Gemini, OpenAI, Anthropic, DeepSeek, Mock), see [docs/LLM_INTEGRATION.md](./LLM_INTEGRATION.md).
 
 Run the server:
 ```bash
